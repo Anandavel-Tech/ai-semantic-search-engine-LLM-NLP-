@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}{{ document.title }} - Document Intelligence{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb small">
+      <li class="breadcrumb-item"><a href="{{ url_for('documents_page') }}" class="text-decoration-none">Documents</a></li>
+      <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">{{ document.title }}</li>
+    </ol>
+  </nav>
+
+  <!-- Document Header Card -->
+  <div class="card shadow-sm border-0 mb-4">
+    <div class="card-body p-4 p-md-5">
+      <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+        <div>
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge {% if document.file_type == 'pdf' %}bg-danger-subtle text-danger border border-danger-subtle{% else %}bg-secondary-subtle text-secondary border border-secondary-subtle{% endif %} text-uppercase font-monospace">
+              {{ document.file_type }}
+            </span>
+            <span class="badge bg-light text-secondary border font-monospace">ID: #{{ document.id }}</span>
+            <span class="badge bg-success-subtle text-success border border-success-subtle font-monospace">
+              <i class="bi bi-check2 me-1"></i> Indexed
+            </span>
+          </div>
+          <h2 class="h3 fw-bold text-dark mb-1">{{ document.title }}</h2>
+          <p class="text-secondary small mb-0">Original filename: <code class="font-monospace text-primary">{{ document.original_filename }}</code></p>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+          <a href="{{ url_for('visualizations_page', doc_id=document.id) }}" class="btn btn-outline-success btn-sm fw-semibold">
+            <i class="bi bi-pie-chart-fill me-1"></i> Visual Analysis
+          </a>
+          <a href="{{ url_for('summarize_action', doc_id=document.id) }}" class="btn btn-outline-primary btn-sm fw-semibold">
+            <i class="bi bi-card-text me-1"></i> Summarize Content
+          </a>
+          <form action="{{ url_for('delete_document_action', doc_id=document.id) }}" method="POST" onsubmit="return confirm('Delete document and all indexed passages?');">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+              <i class="bi bi-trash me-1"></i> Delete
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <hr class="my-4 text-muted">
+
+      <!-- Metadata Attributes Grid -->
+      <div class="row g-3 text-center">
+        <div class="col-6 col-md-3">
+          <div class="p-3 bg-light rounded-3 border">
+            <div class="small text-secondary fw-semibold">Word Count</div>
+            <div class="h5 fw-bold text-dark mb-0 font-monospace">{{ document.word_count }}</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3 bg-light rounded-3 border">
+            <div class="small text-secondary fw-semibold">File Size</div>
+            <div class="h5 fw-bold text-dark mb-0 font-monospace">{{ (document.file_size / 1024)|round(1) }} KB</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3 bg-light rounded-3 border">
+            <div class="small text-secondary fw-semibold">Passage Chunks</div>
+            <div class="h5 fw-bold text-primary mb-0 font-monospace">{{ chunks|length }}</div>
+          </div>
+        </div>
+        <div class="col-6 col-md-3">
+          <div class="p-3 bg-light rounded-3 border">
+            <div class="small text-secondary fw-semibold">SHA-256 Checksum</div>
+            <div class="fw-bold font-monospace text-truncate small" title="{{ document.checksum }}">
+              {{ document.checksum[:16] }}...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary Section (if available) -->
+  {% if summary %}
+    <div class="card shadow-sm border-0 border-start border-4 border-info mb-4">
+      <div class="card-header bg-white py-3">
+        <h5 class="h6 fw-bold mb-0 text-info"><i class="bi bi-stars me-2"></i>Executive Summary (Generated via {{ summary_method }})</h5>
+      </div>
+      <div class="card-body p-4">
+        <p class="mb-0 text-secondary lh-base">{{ summary }}</p>
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Chunks Breakdown -->
+  <div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white py-3">
+      <h5 class="h6 fw-bold mb-0 text-dark">
+        <i class="bi bi-layers text-primary me-2"></i>Indexed Passage Chunks ({{ chunks|length }})
+      </h5>
+    </div>
+    <div class="card-body p-4">
+      <div class="d-flex flex-column gap-3">
+        {% for ch in chunks %}
+          <div class="p-3 border rounded-3 bg-light">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge bg-secondary font-monospace">Passage Index #{{ ch.chunk_index }}</span>
+              <span class="small text-muted font-monospace">Page: {{ ch.page_number|default(1) }} | {{ ch.word_count }} words</span>
+            </div>
+            <p class="text-secondary small mb-0 lh-base">{{ ch.text }}</p>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}

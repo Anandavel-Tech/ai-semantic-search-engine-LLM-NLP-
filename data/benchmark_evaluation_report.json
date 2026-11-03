@@ -1,0 +1,398 @@
+{
+  "top_k": 5,
+  "benchmark_query_count": 8,
+  "modes_evaluated": {
+    "keyword": {
+      "mode": "keyword",
+      "precision_at_k": 0.5,
+      "recall_at_k": 0.9062,
+      "mrr": 1.0,
+      "avg_latency_ms": 5.4,
+      "query_count": 8,
+      "per_query_results": [
+        {
+          "query_id": "Q1",
+          "query": "How can AI detect diseases early in healthcare analytics?",
+          "topic": "Healthcare AI",
+          "retrieved_count": 5,
+          "relevant_retrieved": 3,
+          "precision_at_k": 0.6,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 6.21
+        },
+        {
+          "query_id": "Q2",
+          "query": "Transformer attention mechanisms query key value self-attention",
+          "topic": "Transformers & Attention",
+          "retrieved_count": 5,
+          "relevant_retrieved": 3,
+          "precision_at_k": 0.6,
+          "recall_at_k": 0.75,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 4.01
+        },
+        {
+          "query_id": "Q3",
+          "query": "Inverted index posting lists boolean retrieval term frequency",
+          "topic": "Information Retrieval",
+          "retrieved_count": 5,
+          "relevant_retrieved": 5,
+          "precision_at_k": 1.0,
+          "recall_at_k": 0.833,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 5.96
+        },
+        {
+          "query_id": "Q4",
+          "query": "Cybersecurity intrusion detection machine learning threat analysis",
+          "topic": "Cybersecurity",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 5.97
+        },
+        {
+          "query_id": "Q5",
+          "query": "Renewable energy forecasting solar wind climate science",
+          "topic": "Climate & Energy",
+          "retrieved_count": 4,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 5.51
+        },
+        {
+          "query_id": "Q6",
+          "query": "Word2Vec skip-gram continuous bag of words embeddings",
+          "topic": "Word Embeddings",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 0.667,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 5.54
+        },
+        {
+          "query_id": "Q7",
+          "query": "Deep learning convolutional neural networks computer vision",
+          "topic": "Computer Vision",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 4.91
+        },
+        {
+          "query_id": "Q8",
+          "query": "Natural language processing lemmatization tokenization preprocessing",
+          "topic": "NLP Preprocessing",
+          "retrieved_count": 5,
+          "relevant_retrieved": 1,
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 5.13
+        }
+      ]
+    },
+    "semantic": {
+      "mode": "semantic",
+      "precision_at_k": 0.475,
+      "recall_at_k": 0.8854,
+      "mrr": 0.9375,
+      "avg_latency_ms": 7578.19,
+      "query_count": 8,
+      "per_query_results": [
+        {
+          "query_id": "Q1",
+          "query": "How can AI detect diseases early in healthcare analytics?",
+          "topic": "Healthcare AI",
+          "retrieved_count": 5,
+          "relevant_retrieved": 3,
+          "precision_at_k": 0.6,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 0.5,
+          "latency_ms": 60233.27
+        },
+        {
+          "query_id": "Q2",
+          "query": "Transformer attention mechanisms query key value self-attention",
+          "topic": "Transformers & Attention",
+          "retrieved_count": 5,
+          "relevant_retrieved": 3,
+          "precision_at_k": 0.6,
+          "recall_at_k": 0.75,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 128.14
+        },
+        {
+          "query_id": "Q3",
+          "query": "Inverted index posting lists boolean retrieval term frequency",
+          "topic": "Information Retrieval",
+          "retrieved_count": 5,
+          "relevant_retrieved": 4,
+          "precision_at_k": 0.8,
+          "recall_at_k": 0.667,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 112.96
+        },
+        {
+          "query_id": "Q4",
+          "query": "Cybersecurity intrusion detection machine learning threat analysis",
+          "topic": "Cybersecurity",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 24.18
+        },
+        {
+          "query_id": "Q5",
+          "query": "Renewable energy forecasting solar wind climate science",
+          "topic": "Climate & Energy",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 26.67
+        },
+        {
+          "query_id": "Q6",
+          "query": "Word2Vec skip-gram continuous bag of words embeddings",
+          "topic": "Word Embeddings",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 0.667,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 38.14
+        },
+        {
+          "query_id": "Q7",
+          "query": "Deep learning convolutional neural networks computer vision",
+          "topic": "Computer Vision",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 24.77
+        },
+        {
+          "query_id": "Q8",
+          "query": "Natural language processing lemmatization tokenization preprocessing",
+          "topic": "NLP Preprocessing",
+          "retrieved_count": 5,
+          "relevant_retrieved": 1,
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 37.42
+        }
+      ]
+    },
+    "hybrid": {
+      "mode": "hybrid",
+      "precision_at_k": 0.45,
+      "recall_at_k": 0.8438,
+      "mrr": 1.0,
+      "avg_latency_ms": 122.07,
+      "query_count": 8,
+      "per_query_results": [
+        {
+          "query_id": "Q1",
+          "query": "How can AI detect diseases early in healthcare analytics?",
+          "topic": "Healthcare AI",
+          "retrieved_count": 5,
+          "relevant_retrieved": 3,
+          "precision_at_k": 0.6,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 39.11
+        },
+        {
+          "query_id": "Q2",
+          "query": "Transformer attention mechanisms query key value self-attention",
+          "topic": "Transformers & Attention",
+          "retrieved_count": 5,
+          "relevant_retrieved": 3,
+          "precision_at_k": 0.6,
+          "recall_at_k": 0.75,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 43.24
+        },
+        {
+          "query_id": "Q3",
+          "query": "Inverted index posting lists boolean retrieval term frequency",
+          "topic": "Information Retrieval",
+          "retrieved_count": 5,
+          "relevant_retrieved": 4,
+          "precision_at_k": 0.8,
+          "recall_at_k": 0.667,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 36.38
+        },
+        {
+          "query_id": "Q4",
+          "query": "Cybersecurity intrusion detection machine learning threat analysis",
+          "topic": "Cybersecurity",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 35.02
+        },
+        {
+          "query_id": "Q5",
+          "query": "Renewable energy forecasting solar wind climate science",
+          "topic": "Climate & Energy",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 182.27
+        },
+        {
+          "query_id": "Q6",
+          "query": "Word2Vec skip-gram continuous bag of words embeddings",
+          "topic": "Word Embeddings",
+          "retrieved_count": 5,
+          "relevant_retrieved": 1,
+          "precision_at_k": 0.2,
+          "recall_at_k": 0.333,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 278.36
+        },
+        {
+          "query_id": "Q7",
+          "query": "Deep learning convolutional neural networks computer vision",
+          "topic": "Computer Vision",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 204.15
+        },
+        {
+          "query_id": "Q8",
+          "query": "Natural language processing lemmatization tokenization preprocessing",
+          "topic": "NLP Preprocessing",
+          "retrieved_count": 5,
+          "relevant_retrieved": 1,
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 158.05
+        }
+      ]
+    },
+    "inverted_index": {
+      "mode": "inverted_index",
+      "precision_at_k": 0.5,
+      "recall_at_k": 0.9062,
+      "mrr": 1.0,
+      "avg_latency_ms": 0.55,
+      "query_count": 8,
+      "per_query_results": [
+        {
+          "query_id": "Q1",
+          "query": "How can AI detect diseases early in healthcare analytics?",
+          "topic": "Healthcare AI",
+          "retrieved_count": 5,
+          "relevant_retrieved": 3,
+          "precision_at_k": 0.6,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 1.09
+        },
+        {
+          "query_id": "Q2",
+          "query": "Transformer attention mechanisms query key value self-attention",
+          "topic": "Transformers & Attention",
+          "retrieved_count": 5,
+          "relevant_retrieved": 3,
+          "precision_at_k": 0.6,
+          "recall_at_k": 0.75,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 0.77
+        },
+        {
+          "query_id": "Q3",
+          "query": "Inverted index posting lists boolean retrieval term frequency",
+          "topic": "Information Retrieval",
+          "retrieved_count": 5,
+          "relevant_retrieved": 5,
+          "precision_at_k": 1.0,
+          "recall_at_k": 0.833,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 0.48
+        },
+        {
+          "query_id": "Q4",
+          "query": "Cybersecurity intrusion detection machine learning threat analysis",
+          "topic": "Cybersecurity",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 0.61
+        },
+        {
+          "query_id": "Q5",
+          "query": "Renewable energy forecasting solar wind climate science",
+          "topic": "Climate & Energy",
+          "retrieved_count": 4,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 0.35
+        },
+        {
+          "query_id": "Q6",
+          "query": "Word2Vec skip-gram continuous bag of words embeddings",
+          "topic": "Word Embeddings",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 0.667,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 0.34
+        },
+        {
+          "query_id": "Q7",
+          "query": "Deep learning convolutional neural networks computer vision",
+          "topic": "Computer Vision",
+          "retrieved_count": 5,
+          "relevant_retrieved": 2,
+          "precision_at_k": 0.4,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 0.44
+        },
+        {
+          "query_id": "Q8",
+          "query": "Natural language processing lemmatization tokenization preprocessing",
+          "topic": "NLP Preprocessing",
+          "retrieved_count": 5,
+          "relevant_retrieved": 1,
+          "precision_at_k": 0.2,
+          "recall_at_k": 1.0,
+          "reciprocal_rank": 1.0,
+          "latency_ms": 0.31
+        }
+      ]
+    }
+  }
+}

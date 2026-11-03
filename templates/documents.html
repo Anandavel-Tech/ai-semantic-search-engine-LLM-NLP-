@@ -1,0 +1,114 @@
+{% extends "base.html" %}
+
+{% block title %}Corpus Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+    <div>
+      <h3 class="h4 fw-bold mb-1 text-dark"><i class="bi bi-folder2-open text-primary me-2"></i>Document Corpus Management</h3>
+      <p class="text-secondary small mb-0">Browse, inspect extracted passages, summarize content, and manage indexed PDF and TXT documents.</p>
+    </div>
+    <div>
+      <a href="{{ url_for('upload_page') }}" class="btn btn-primary btn-sm px-3 fw-semibold">
+        <i class="bi bi-cloud-arrow-up-fill me-1"></i> Ingest New Document
+      </a>
+    </div>
+  </div>
+
+  <!-- Documents Table Card -->
+  <div class="card shadow-sm border-0 mb-5">
+    <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+      <span class="fw-bold text-dark"><i class="bi bi-files text-secondary me-2"></i>Indexed Documents Repository ({{ documents|length }})</span>
+      <input type="text" id="docSearchFilter" class="form-control form-control-sm w-auto" placeholder="Filter by title..." onkeyup="filterDocs()">
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0 table-custom" id="docsTable">
+          <thead>
+            <tr>
+              <th scope="col" style="width: 60px;">ID</th>
+              <th scope="col">Document Title</th>
+              <th scope="col">Format</th>
+              <th scope="col">File Size</th>
+              <th scope="col">Words</th>
+              <th scope="col">Passages</th>
+              <th scope="col">Ingested</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in documents %}
+              <tr>
+                <td class="text-muted fw-semibold font-monospace small">#{{ doc.id }}</td>
+                <td>
+                  <a href="{{ url_for('document_detail', doc_id=doc.id) }}" class="fw-semibold text-dark text-decoration-none hover-primary">
+                    {{ doc.title }}
+                  </a>
+                  <div class="text-muted small font-monospace" style="font-size: 0.775rem;">{{ doc.original_filename }}</div>
+                </td>
+                <td>
+                  {% if doc.file_type == 'pdf' %}
+                    <span class="badge bg-danger-subtle text-danger border border-danger-subtle text-uppercase px-2 font-monospace">PDF</span>
+                  {% else %}
+                    <span class="badge bg-secondary-subtle text-secondary border border-secondary-subtle text-uppercase px-2 font-monospace">TXT</span>
+                  {% endif %}
+                </td>
+                <td class="small text-muted font-monospace">{{ (doc.file_size / 1024)|round(1) }} KB</td>
+                <td class="small fw-semibold font-monospace">{{ doc.word_count }}</td>
+                <td>
+                  <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace">{{ doc.chunk_count }} chunks</span>
+                </td>
+                <td class="small text-muted font-monospace">{{ doc.created_at[:10] if doc.created_at else '' }}</td>
+                <td class="text-end">
+                  <div class="btn-group btn-group-sm">
+                    <a href="{{ url_for('document_detail', doc_id=doc.id) }}" class="btn btn-outline-secondary" title="View Passages & Details">
+                      <i class="bi bi-eye"></i>
+                    </a>
+                    <a href="{{ url_for('visualizations_page', doc_id=doc.id) }}" class="btn btn-outline-success" title="Visual Linguistic Analysis">
+                      <i class="bi bi-pie-chart"></i>
+                    </a>
+                    <a href="{{ url_for('summarize_action', doc_id=doc.id) }}" class="btn btn-outline-info" title="Synthesize Executive Summary">
+                      <i class="bi bi-card-text"></i>
+                    </a>
+                    <form action="{{ url_for('delete_document_action', doc_id=doc.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Are you sure you want to delete this document and all its indexed passages?');">
+                      <button type="submit" class="btn btn-outline-danger" title="Delete Document">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% else %}
+              <tr>
+                <td colspan="8" class="text-center py-5 text-muted">
+                  <i class="bi bi-inbox display-4 mb-2"></i>
+                  <p class="mb-0">No documents found. Please upload documents or run sample data generation.</p>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+function filterDocs() {
+  const input = document.getElementById("docSearchFilter");
+  const filter = input.value.toLowerCase();
+  const rows = document.querySelectorAll("#docsTable tbody tr");
+  rows.forEach(row => {
+    const titleCell = row.cells[1];
+    if (titleCell) {
+      const text = titleCell.textContent || titleCell.innerText;
+      row.style.display = text.toLowerCase().includes(filter) ? "" : "none";
+    }
+  });
+}
+</script>
+{% endblock %}

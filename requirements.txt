@@ -1,0 +1,33 @@
+# Complete NLP Project Requirements
+# Compatible with Python 3.11 - 3.12+ on Windows x86_64
+
+# Web Framework & Core Utilities
+flask>=3.0.0
+python-dotenv>=1.0.0
+requests>=2.31.0
+click>=8.1.0
+
+# Scientific Computing & Traditional NLP/IR
+numpy>=1.26.0
+scipy>=1.12.0
+scikit-learn>=1.4.0
+nltk>=3.8.1
+
+# Document Ingestion
+pymupdf>=1.24.0
+
+# Educational Word Embeddings
+gensim>=4.3.0
+
+# Deep Learning, Transformers & Semantic Embeddings
+torch>=2.2.0
+transformers>=4.40.0
+sentence-transformers>=3.0.0
+
+# Visualization & Linguistic Graphs
+matplotlib>=3.8.0
+wordcloud>=1.9.0
+networkx>=3.0
+
+# Testing
+pytest>=8.0.0

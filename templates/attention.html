@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+
+{% block title %}Transformer Attention Visualizer{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+
+  <div class="row justify-content-center">
+    <div class="col-xl-11">
+
+      <!-- Header -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-primary text-uppercase px-2 py-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Transformer Architecture</span>
+            <span class="badge bg-light text-secondary border">Multi-Head Self-Attention</span>
+          </div>
+          <h2 class="h3 fw-bold text-dark mb-2">
+            <i class="bi bi-layers-half text-primary me-2"></i>Transformer Attention Mechanism Visualizer
+          </h2>
+          <p class="text-secondary mb-4" style="max-width: 820px; font-size: 0.95rem;">
+            Tokenize natural language sequences, pass through a pretrained transformer encoder, extract genuine multi-head self-attention weight matrices, and visualize token-to-token attention probability distributions.
+          </p>
+
+          <form action="{{ url_for('attention_action') }}" method="GET">
+            <div class="mb-3">
+              <label for="attnSentence" class="form-label small fw-bold text-secondary">Input Sequence:</label>
+              <div class="search-box-container input-group">
+                <input 
+                  type="text" 
+                  class="form-control form-control-lg border-0 ps-3" 
+                  id="attnSentence" 
+                  name="sentence" 
+                  placeholder="Enter a sequence to compute attention weights..." 
+                  value="{{ sentence|default('Artificial intelligence detects disease early in healthcare analytics.') }}" 
+                  required
+                >
+                <button class="btn btn-primary px-4 fw-semibold d-inline-flex align-items-center" type="submit">
+                  <i class="bi bi-eye me-1"></i> Compute Attention
+                </button>
+              </div>
+            </div>
+
+            <!-- Configuration: Layer & Head Selection -->
+            <div class="row g-3 align-items-center bg-light p-3 rounded-3 border mb-3">
+              <div class="col-md-6">
+                <label for="layerSelect" class="form-label small fw-bold text-secondary mb-1">Transformer Layer:</label>
+                <select class="form-select form-select-sm" id="layerSelect" name="layer">
+                  {% for l in range(1, num_layers|default(6) + 1) %}
+                    <option value="{{ l }}" {% if selected_layer == l %}selected{% endif %}>Layer {{ l }} (of {{ num_layers|default(6) }})</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="col-md-6">
+                <label for="headSelect" class="form-label small fw-bold text-secondary mb-1">Attention Head:</label>
+                <select class="form-select form-select-sm" id="headSelect" name="head">
+                  <option value="avg" {% if selected_head == 'avg' or selected_head == 'Averaged Across All Heads' %}selected{% endif %}>Averaged Across All Heads</option>
+                  {% for h in range(1, num_heads|default(12) + 1) %}
+                    <option value="{{ h }}" {% if selected_head == h or selected_head == 'Head #' ~ h %}selected{% endif %}>Head #{{ h }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+            </div>
+
+            <!-- Preset Buttons -->
+            <div class="d-flex flex-wrap align-items-center gap-1">
+              <span class="small text-secondary me-2 fw-semibold"><i class="bi bi-lightbulb text-warning me-1"></i>Sample Sequences:</span>
+              <button type="button" class="search-suggestion-pill btn btn-sm py-1 px-3" onclick="setAttn('Artificial intelligence detects disease early in healthcare analytics.')">
+                Healthcare AI
+              </button>
+              <button type="button" class="search-suggestion-pill btn btn-sm py-1 px-3" onclick="setAttn('The transformer model attends to surrounding context words.')">
+                Transformer self-attention
+              </button>
+              <button type="button" class="search-suggestion-pill btn btn-sm py-1 px-3" onclick="setAttn('Inverted index maps terms to posting lists in search engines.')">
+                Inverted Index
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Attention Visualization Display -->
+      <div class="row g-4 mb-5">
+        <!-- Heatmap Image Column -->
+        <div class="col-lg-7">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+              <span class="fw-bold text-dark"><i class="bi bi-grid-3x3 text-primary me-2"></i>Attention Weight Heatmap</span>
+              <span class="badge bg-light text-secondary border font-monospace small">{{ model_type }}</span>
+            </div>
+            <div class="card-body p-4 text-center">
+              {% if heatmap_base64 %}
+                <div class="heatmap-container mb-3 shadow-sm border rounded">
+                  <img src="data:image/png;base64,{{ heatmap_base64 }}" alt="Transformer Attention Heatmap" class="img-fluid rounded">
+                </div>
+                <div class="text-secondary small">
+                  Rows represent <strong>Query tokens</strong> (attending from); columns represent <strong>Key tokens</strong> (attended to). Darker blue signifies higher softmax probability mass.
+                </div>
+              {% else %}
+                <div class="p-5 text-center text-muted">
+                  <i class="bi bi-layers display-4 mb-2"></i>
+                  <p class="mb-0">Run attention extraction to visualize token interaction heatmap.</p>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Token Information & Mathematical Details -->
+        <div class="col-lg-5">
+          <div class="card shadow-sm border-0 h-100">
+            <div class="card-header bg-white py-3">
+              <h5 class="h6 fw-bold mb-0 text-dark"><i class="bi bi-cpu text-primary me-2"></i>Mathematical Foundations</h5>
+            </div>
+            <div class="card-body p-4">
+              <!-- Tokens List -->
+              <div class="mb-4">
+                <span class="small fw-bold text-secondary text-uppercase d-block mb-2">Tokenized Sequence ({{ tokens|length }} tokens):</span>
+                <div class="d-flex flex-wrap gap-1">
+                  {% for t in tokens %}
+                    <span class="badge bg-light text-dark border font-monospace px-2 py-1">{{ t }}</span>
+                  {% endfor %}
+                </div>
+              </div>
+
+              <!-- Mathematical Equation Box -->
+              <div class="p-3 bg-light rounded-3 mb-3 border">
+                <h6 class="fw-bold small text-primary mb-2">Scaled Dot-Product Attention:</h6>
+                <div class="font-monospace text-dark p-2 bg-white rounded border mb-2 small text-center">
+                  Attention(Q, K, V) = softmax((Q K^T) / &radic;d_k) V
+                </div>
+                <p class="text-secondary small mb-0" style="font-size: 0.8rem;">
+                  Query (\(Q\)) and Key (\(K\)) vectors are multiplied via dot product, scaled by the square root of projection dimension \(d_k\), and passed through softmax to produce normalized attention weights.
+                </p>
+              </div>
+
+              <div class="p-3 bg-light rounded-3 border">
+                <h6 class="fw-bold small text-success mb-2">Multi-Head Projection:</h6>
+                <p class="text-secondary small mb-0" style="font-size: 0.8rem;">
+                  Instead of computing a single attention function, Multi-Head Attention projects Queries, Keys, and Values \(h\) times into lower-dimensional subspaces, allowing the model to jointly attend to information at different positions.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function setAttn(text) {
+  document.getElementById('attnSentence').value = text;
+}
+</script>
+{% endblock %}

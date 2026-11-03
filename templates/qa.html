@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Retrieval-Augmented Generation (RAG){% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+
+  <div class="row justify-content-center">
+    <div class="col-xl-10">
+
+      <!-- Header -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-primary text-uppercase px-2 py-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">RAG Pipeline</span>
+            <span class="badge bg-light text-secondary border">Context-Grounded Generation</span>
+          </div>
+          <h2 class="h3 fw-bold text-dark mb-2">
+            <i class="bi bi-chat-quote-fill text-primary me-2"></i>Context-Grounded Question Answering
+          </h2>
+          <p class="text-secondary mb-4" style="max-width: 820px; font-size: 0.95rem;">
+            Query the ingested document repository using natural language. The system retrieves salient passages via hybrid semantic search, constructs an isolated context boundary, and generates factual answers strictly grounded in document evidence.
+          </p>
+
+          <form action="{{ url_for('qa_action') }}" method="GET">
+            <div class="search-box-container input-group mb-3">
+              <span class="input-group-text bg-white border-0 ps-3 pe-2">
+                <i class="bi bi-question-circle text-primary fs-5"></i>
+              </span>
+              <input 
+                type="text" 
+                class="form-control form-control-lg border-0 ps-1" 
+                name="question" 
+                id="qaInput" 
+                placeholder="Ask e.g., 'How can AI detect diseases early in healthcare analytics?'..." 
+                value="{{ question|default('') }}" 
+                required
+              >
+              <button class="btn btn-primary px-4 fw-semibold d-inline-flex align-items-center" type="submit">
+                <i class="bi bi-stars me-1"></i>
+                <span>Synthesize</span>
+              </button>
+            </div>
+
+            <!-- Example Question Pills -->
+            <div class="d-flex flex-wrap align-items-center gap-1">
+              <span class="small text-secondary me-2 fw-semibold"><i class="bi bi-lightbulb text-warning me-1"></i>Recommended Prompts:</span>
+              <button type="button" class="search-suggestion-pill btn btn-sm py-1 px-3" onclick="setQ('How can AI detect diseases early in healthcare analytics?')">
+                Early disease detection
+              </button>
+              <button type="button" class="search-suggestion-pill btn btn-sm py-1 px-3" onclick="setQ('Explain the mathematical formulation of Scaled Dot-Product Attention.')">
+                Scaled Dot-Product Attention
+              </button>
+              <button type="button" class="search-suggestion-pill btn btn-sm py-1 px-3" onclick="setQ('How does an inverted index structure posting lists for search engines?')">
+                Inverted index postings
+              </button>
+              <button type="button" class="search-suggestion-pill btn btn-sm py-1 px-3" onclick="setQ('What are the key defenses against prompt injection in LLMs?')">
+                Prompt injection defenses
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      {% if question %}
+        <!-- AI Generated Answer Card -->
+        <div class="card shadow-sm border-0 border-start border-4 {% if answer_data.has_sufficient_evidence %}border-success{% else %}border-warning{% endif %} mb-4">
+          <div class="card-header bg-white py-3 d-flex flex-wrap justify-content-between align-items-center gap-2">
+            <div class="d-flex align-items-center gap-2">
+              <div class="brand-icon me-1" style="width: 28px; height: 28px; font-size: 0.85rem;">
+                <i class="bi bi-cpu-fill"></i>
+              </div>
+              <span class="fw-bold text-dark">Synthesized Answer</span>
+              <span class="badge bg-light text-secondary border font-monospace small">Engine: {{ answer_data.provider }}</span>
+            </div>
+            <div>
+              {% if answer_data.has_sufficient_evidence %}
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2">
+                  <i class="bi bi-shield-check me-1"></i> Grounded in Corpus Evidence
+                </span>
+              {% else %}
+                <span class="badge bg-warning-subtle text-warning border border-warning-subtle px-3 py-2">
+                  <i class="bi bi-exclamation-triangle me-1"></i> Insufficient Evidence in Corpus
+                </span>
+              {% endif %}
+            </div>
+          </div>
+          <div class="card-body p-4 p-md-5">
+            <div class="lead fs-6 text-dark lh-base mb-4" style="white-space: pre-wrap; font-weight: 450;">
+              {{ answer_data.answer }}
+            </div>
+
+            <!-- Citations List -->
+            {% if answer_data.citations %}
+              <div class="pt-3 border-top">
+                <span class="small fw-bold text-secondary text-uppercase d-block mb-3">
+                  <i class="bi bi-bookmark-check-fill text-success me-1"></i>Verified Source Citations:
+                </span>
+                <div class="d-flex flex-wrap gap-2">
+                  {% for c in answer_data.citations %}
+                    <span class="badge bg-white text-dark border p-2 shadow-sm small font-monospace">
+                      <i class="bi bi-file-earmark-text text-primary me-1"></i>
+                      <strong>{{ c.doc_title }}</strong> (Page {{ c.page_number }})
+                    </span>
+                  {% endfor %}
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Retrieved Passages Context Card -->
+        <div class="card shadow-sm border-0 mb-5">
+          <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+            <h5 class="h6 fw-bold mb-0">
+              <i class="bi bi-layers text-primary me-2"></i>Retrieved Grounding Context Passages (Top-{{ passages|length }})
+            </h5>
+            <span class="badge bg-light text-secondary border font-monospace small">Augmented Context Injected</span>
+          </div>
+          <div class="card-body p-4">
+            <div class="accordion" id="passagesAccordion">
+              {% for p in passages %}
+                <div class="accordion-item mb-2 border rounded">
+                  <h2 class="accordion-header" id="heading{{ loop.index }}">
+                    <button class="accordion-button collapsed py-2 px-3 small fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapse{{ loop.index }}">
+                      <span class="badge bg-primary rounded-circle me-2 font-monospace">#{{ loop.index }}</span>
+                      {{ p.doc_title }} (Score: {{ p.final_score|default(p.score|default('N/A')) }})
+                    </button>
+                  </h2>
+                  <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" data-bs-parent="#passagesAccordion">
+                    <div class="accordion-body small text-secondary bg-light">
+                      <p class="mb-2">{{ p.text }}</p>
+                      <div class="d-flex justify-content-between align-items-center pt-2 border-top text-muted font-monospace" style="font-size: 0.75rem;">
+                        <span>Document ID: #{{ p.document_id }} | Page: {{ p.page_number|default(1) }}</span>
+                        <a href="{{ url_for('document_detail', doc_id=p.document_id) }}" class="text-decoration-none text-primary">View Document &rarr;</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+function setQ(text) {
+  document.getElementById('qaInput').value = text;
+}
+</script>
+{% endblock %}

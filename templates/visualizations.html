@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+{% block title %}Corpus Linguistic Visualizations{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+
+  <!-- Header -->
+  <div class="row justify-content-center mb-4">
+    <div class="col-xl-11">
+      <div class="card shadow-sm border-0">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex align-items-center gap-2 mb-2">
+            <span class="badge bg-primary text-uppercase px-2 py-1" style="font-size: 0.7rem; letter-spacing: 0.05em;">Linguistic Intelligence</span>
+            <span class="badge bg-light text-secondary border">Corpus & Document Level</span>
+          </div>
+          <h2 class="h3 fw-bold text-dark mb-2">
+            <i class="bi bi-pie-chart-fill text-primary me-2"></i>NLP Text Visualizations & Linguistic Graphs
+          </h2>
+          <p class="text-secondary mb-4" style="max-width: 820px; font-size: 0.95rem;">
+            Explore lexical distributions and structural relationships across your document corpus with dynamic <strong>Word Clouds</strong>, 
+            <strong>Bigram Co-occurrence</strong> network graphs, and <strong>Frequency Bar Charts</strong>.
+          </p>
+
+          <!-- Selection Controls Form -->
+          <form action="{{ url_for('visualizations_page') }}" method="GET" class="row g-3 align-items-end bg-light p-3 rounded-3 border">
+            <div class="col-md-5">
+              <label for="docSelect" class="form-label small fw-bold text-secondary">Document Scope:</label>
+              <select class="form-select form-select-sm" id="docSelect" name="doc_id">
+                <option value="0" {% if selected_doc_id == 0 %}selected{% endif %}>
+                  All Ingested Documents (Corpus-Wide Analysis)
+                </option>
+                {% for d in all_documents %}
+                  <option value="{{ d.id }}" {% if selected_doc_id == d.id %}selected{% endif %}>
+                    Document #{{ d.id }}: {{ d.title }} ({{ d.word_count }} words)
+                  </option>
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="col-md-3">
+              <label for="barChartType" class="form-label small fw-bold text-secondary">Bar Chart Mode:</label>
+              <select class="form-select form-select-sm" id="barChartType" name="bar_type">
+                <option value="unigram" {% if bar_type == 'unigram' %}selected{% endif %}>Unigrams (Single Tokens)</option>
+                <option value="bigram" {% if bar_type == 'bigram' %}selected{% endif %}>Bigrams (Collocations)</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <label for="topN" class="form-label small fw-bold text-secondary">Top Elements:</label>
+              <select class="form-select form-select-sm" id="topN" name="top_n">
+                <option value="10" {% if top_n == 10 %}selected{% endif %}>10 items</option>
+                <option value="15" {% if top_n == 15 %}selected{% endif %}>15 items</option>
+                <option value="20" {% if top_n == 20 %}selected{% endif %}>20 items</option>
+                <option value="25" {% if top_n == 25 %}selected{% endif %}>25 items</option>
+              </select>
+            </div>
+
+            <div class="col-md-2">
+              <button type="submit" class="btn btn-primary btn-sm w-100 fw-semibold">
+                <i class="bi bi-arrow-repeat me-1"></i> Update Graphs
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row justify-content-center">
+    <div class="col-xl-11">
+
+      <!-- Active Scope Banner -->
+      <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded-3 border mb-4 shadow-sm">
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-secondary text-uppercase" style="font-size: 0.7rem;">Active Scope</span>
+          <span class="fw-bold text-dark">
+            {% if selected_doc_id == 0 %}
+              All Ingested Documents (Corpus-Wide Analysis)
+            {% else %}
+              Document #{{ selected_doc_id }}: {{ current_doc_title }}
+            {% endif %}
+          </span>
+        </div>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle font-monospace px-3 py-2">
+          {{ word_count }} Normalized Tokens
+        </span>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <ul class="nav nav-pills nav-fill mb-4 p-1 bg-white rounded-3 border shadow-sm" id="vizTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active fw-semibold" id="wordcloud-tab" data-bs-toggle="tab" data-bs-target="#wordcloud-pane" type="button" role="tab">
+            <i class="bi bi-cloud-check-fill me-2"></i>Word Cloud
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold" id="network-tab" data-bs-toggle="tab" data-bs-target="#network-pane" type="button" role="tab">
+            <i class="bi bi-diagram-3-fill me-2"></i>Bigram Co-occurrence Network
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link fw-semibold" id="barchart-tab" data-bs-toggle="tab" data-bs-target="#barchart-pane" type="button" role="tab">
+            <i class="bi bi-bar-chart-fill me-2"></i>Frequency Bar Chart
+          </button>
+        </li>
+      </ul>
+
+      <!-- Tab Content Panels -->
+      <div class="tab-content mb-5" id="vizTabsContent">
+
+        <!-- 1. WORD CLOUD TAB -->
+        <div class="tab-pane fade show active" id="wordcloud-pane" role="tabpanel">
+          <div class="row g-4">
+            <div class="col-lg-8">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                  <span class="fw-bold text-dark"><i class="bi bi-cloud-fill text-primary me-2"></i>Word Cloud Visualization</span>
+                  <span class="badge bg-light text-secondary border font-monospace small">Colormap: Viridis</span>
+                </div>
+                <div class="card-body p-4 text-center">
+                  <div class="heatmap-container mb-3 shadow-sm border rounded">
+                    <img src="data:image/png;base64,{{ wordcloud_img }}" alt="Generated Word Cloud" class="img-fluid rounded">
+                  </div>
+                  <p class="text-secondary small mb-0">
+                    Relative font size correlates with term frequency in the selected scope after stopword filtering and normalization.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3">
+                  <h5 class="h6 fw-bold mb-0"><i class="bi bi-list-ol text-primary me-2"></i>High-Frequency Lexical Terms</h5>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                    <table class="table table-hover align-middle small mb-0">
+                      <thead class="table-light sticky-top">
+                        <tr>
+                          <th style="width: 40px;">#</th>
+                          <th>Term</th>
+                          <th class="text-end">Count</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in top_words %}
+                          <tr>
+                            <td class="text-muted font-monospace">{{ loop.index }}</td>
+                            <td class="fw-semibold text-dark">{{ item.word }}</td>
+                            <td class="text-end font-monospace">
+                              <span class="badge bg-primary-subtle text-primary border border-primary-subtle">{{ item.count }}</span>
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. BIGRAM NETWORK GRAPH TAB -->
+        <div class="tab-pane fade" id="network-pane" role="tabpanel">
+          <div class="row g-4">
+            <div class="col-lg-8">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                  <span class="fw-bold text-dark"><i class="bi bi-diagram-3-fill text-success me-2"></i>Bigram Co-occurrence Linguistic Network</span>
+                  <span class="badge bg-light text-secondary border font-monospace small">Spring Layout (NetworkX)</span>
+                </div>
+                <div class="card-body p-4 text-center">
+                  <div class="heatmap-container mb-3 shadow-sm border rounded">
+                    <img src="data:image/png;base64,{{ network_img }}" alt="Bigram Network Graph" class="img-fluid rounded">
+                  </div>
+                  <p class="text-secondary small mb-0">
+                    Nodes represent salient terms. Edges denote sequential phrase adjacency; line weight reflects transition frequency.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3">
+                  <h5 class="h6 fw-bold mb-0"><i class="bi bi-link-45deg text-success me-2"></i>Strongest Bigram Collocations</h5>
+                </div>
+                <div class="card-body p-0">
+                  <div class="table-responsive" style="max-height: 480px; overflow-y: auto;">
+                    <table class="table table-hover align-middle small mb-0">
+                      <thead class="table-light sticky-top">
+                        <tr>
+                          <th style="width: 40px;">#</th>
+                          <th>Phrase Pair (w₁ → w₂)</th>
+                          <th class="text-end">Weight</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {% for item in top_bigrams %}
+                          <tr>
+                            <td class="text-muted font-monospace">{{ loop.index }}</td>
+                            <td class="fw-semibold text-dark">{{ item.bigram }}</td>
+                            <td class="text-end font-monospace">
+                              <span class="badge bg-danger-subtle text-danger border border-danger-subtle">{{ item.count }}</span>
+                            </td>
+                          </tr>
+                        {% endfor %}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. FREQUENCY BAR CHART TAB -->
+        <div class="tab-pane fade" id="barchart-pane" role="tabpanel">
+          <div class="row g-4">
+            <div class="col-lg-8">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                  <span class="fw-bold text-dark"><i class="bi bi-bar-chart-fill text-info me-2"></i>Frequency Bar Chart Distribution</span>
+                  <span class="badge bg-light text-secondary border text-uppercase font-monospace small">{{ bar_type }}</span>
+                </div>
+                <div class="card-body p-4 text-center">
+                  <div class="heatmap-container mb-3 shadow-sm border rounded">
+                    <img src="data:image/png;base64,{{ barchart_img }}" alt="Term Frequency Bar Chart" class="img-fluid rounded">
+                  </div>
+                  <p class="text-secondary small mb-0">
+                    Horizontal rank-frequency distribution highlighting dominant lexical markers across the corpus.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-lg-4">
+              <div class="card shadow-sm border-0 h-100">
+                <div class="card-header bg-white py-3">
+                  <h5 class="h6 fw-bold mb-0"><i class="bi bi-cpu text-primary me-2"></i>Computational Linguistic Principles</h5>
+                </div>
+                <div class="card-body p-4">
+                  <div class="p-3 bg-light rounded-3 mb-3 border">
+                    <h6 class="fw-bold small text-primary mb-1">1. Power-Law Vocabulary Distribution (Zipf's Law)</h6>
+                    <p class="text-secondary small mb-0" style="font-size: 0.825rem;">
+                      Natural language exhibits an inverse power-law frequency distribution. Stopword filtering attenuates dominant functional terms to expose discriminative topical keywords.
+                    </p>
+                  </div>
+
+                  <div class="p-3 bg-light rounded-3 mb-3 border">
+                    <h6 class="fw-bold small text-success mb-1">2. Collocation Extraction & Compound Phrasing</h6>
+                    <p class="text-secondary small mb-0" style="font-size: 0.825rem;">
+                      Multi-word expressions like <em>"machine learning"</em> or <em>"attention mechanism"</em> convey composite semantic units that preserve meaning beyond bag-of-words assumptions.
+                    </p>
+                  </div>
+
+                  <div class="p-3 bg-light rounded-3 border">
+                    <h6 class="fw-bold small text-info mb-1">3. Graph Centrality & Thematic Core Extraction</h6>
+                    <p class="text-secondary small mb-0" style="font-size: 0.825rem;">
+                      Terms exhibiting high degree and eigenvector centrality in the co-occurrence network form the foundational thematic pillars of the underlying text corpus.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}

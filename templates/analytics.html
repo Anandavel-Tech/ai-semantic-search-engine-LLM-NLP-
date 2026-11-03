@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+
+{% block title %}Search Analytics & Telemetry{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-lg-4 py-4">
+
+  <div class="row justify-content-center">
+    <div class="col-xl-11">
+
+      <!-- Header -->
+      <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+        <div>
+          <h2 class="h3 fw-bold mb-1 text-dark"><i class="bi bi-bar-chart-fill text-primary me-2"></i>Search Analytics & System Telemetry</h2>
+          <p class="text-secondary small mb-0">Empirical benchmark evaluation, retrieval latency telemetry, and query execution audit logs.</p>
+        </div>
+        <div>
+          <form action="{{ url_for('run_eval_action') }}" method="POST">
+            <button type="submit" class="btn btn-outline-primary btn-sm px-3 fw-semibold">
+              <i class="bi bi-arrow-repeat me-1"></i> Re-Run Benchmark Evaluation
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Counters -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="card shadow-sm border-0 p-3 bg-white text-center">
+            <div class="h3 fw-bold text-primary mb-0 font-monospace">{{ stats.total_documents }}</div>
+            <div class="small text-secondary fw-semibold mt-1">Total Documents</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card shadow-sm border-0 p-3 bg-white text-center">
+            <div class="h3 fw-bold text-success mb-0 font-monospace">{{ stats.total_chunks }}</div>
+            <div class="small text-secondary fw-semibold mt-1">Indexed Passages</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card shadow-sm border-0 p-3 bg-white text-center">
+            <div class="h3 fw-bold text-info mb-0 font-monospace">{{ stats.total_searches }}</div>
+            <div class="small text-secondary fw-semibold mt-1">Queries Executed</div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card shadow-sm border-0 p-3 bg-white text-center">
+            <div class="h3 fw-bold text-warning mb-0 font-monospace">{{ stats.average_latency_ms }} ms</div>
+            <div class="small text-secondary fw-semibold mt-1">Avg Retrieval Latency</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empirical Benchmark Results Table -->
+      <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="h6 fw-bold mb-0 text-dark">
+            <i class="bi bi-trophy-fill text-warning me-2"></i>Empirical Search Benchmark Comparison (Ground-Truth Evaluation)
+          </h5>
+        </div>
+        <div class="card-body p-4">
+          <p class="text-secondary small mb-3">
+            Empirical performance measurements across 8 standardized domain evaluation queries with ground-truth relevance sets.
+          </p>
+
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle text-center small mb-0 table-custom">
+              <thead>
+                <tr>
+                  <th class="text-start" style="width: 28%;">Retrieval Mode</th>
+                  <th style="width: 18%;">Precision@5</th>
+                  <th style="width: 18%;">Recall@5</th>
+                  <th style="width: 18%;">Mean Reciprocal Rank (MRR)</th>
+                  <th style="width: 18%;">Avg Latency (ms)</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in eval_metrics %}
+                  <tr {% if row.mode == 'hybrid' %}class="table-primary fw-semibold"{% endif %}>
+                    <td class="text-start fw-bold">
+                      {% if row.mode == 'hybrid' %}
+                        <i class="bi bi-intersect text-primary me-2"></i>Hybrid (TF-IDF + Semantic)
+                      {% elif row.mode == 'semantic' %}
+                        <i class="bi bi-cpu text-success me-2"></i>Dense Semantic (Sentence Transformers)
+                      {% elif row.mode == 'keyword' %}
+                        <i class="bi bi-fonts text-info me-2"></i>Lexical TF-IDF (Scikit-Learn)
+                      {% else %}
+                        <i class="bi bi-list-nested text-secondary me-2"></i>Inverted Index (Positional)
+                      {% endif %}
+                    </td>
+                    <td class="font-monospace">{{ row.precision_at_k }}</td>
+                    <td class="font-monospace">{{ row.recall_at_k }}</td>
+                    <td class="font-monospace">{{ row.mrr }}</td>
+                    <td class="font-monospace">{{ row.avg_latency_ms }} ms</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Search Queries Audit Log -->
+      <div class="card shadow-sm border-0 mb-5">
+        <div class="card-header bg-white py-3">
+          <h5 class="h6 fw-bold mb-0 text-dark">
+            <i class="bi bi-clock-history text-secondary me-2"></i>Recent Search Telemetry Audit Log
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover align-middle small mb-0 table-custom">
+              <thead>
+                <tr>
+                  <th style="width: 60px;">ID</th>
+                  <th>Query String</th>
+                  <th>Mode</th>
+                  <th>Results Returned</th>
+                  <th>Execution Latency</th>
+                  <th class="text-end">Timestamp</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for log in recent_searches %}
+                  <tr>
+                    <td class="text-muted font-monospace">#{{ log.id }}</td>
+                    <td class="fw-semibold text-dark">
+                      <a href="{{ url_for('search_action', query=log.query, mode=log.mode) }}" class="text-decoration-none text-dark hover-primary">
+                        {{ log.query }}
+                      </a>
+                    </td>
+                    <td>
+                      <span class="badge bg-light text-secondary border font-monospace">{{ log.mode }}</span>
+                    </td>
+                    <td class="font-monospace">{{ log.results_count }} passages</td>
+                    <td class="font-monospace text-primary">{{ log.latency_ms }} ms</td>
+                    <td class="text-muted font-monospace text-end">{{ log.timestamp }}</td>
+                  </tr>
+                {% else %}
+                  <tr>
+                    <td colspan="6" class="text-center py-4 text-muted">No search queries logged yet.</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+{% endblock %}
