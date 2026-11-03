@@ -59,6 +59,7 @@ NLP/
 │   ├── word2vec.html          # Word2Vec laboratory (CBOW vs Skip-Gram)
 │   ├── clustering.html        # K-Means & PCA 2D scatter visualizer
 │   ├── analytics.html         # Evaluation benchmarks & query latency history
+│   ├── visualizations.html    # Word Cloud, Bigram Network & Bar Chart
 │   └── settings.html          # Runtime parameters & index rebuilding
 ├── static/
 │   ├── css/custom.css         # Modern styling & responsive theme
@@ -67,13 +68,14 @@ NLP/
 │   ├── create_sample_data.py  # Generates 24 academic demonstration documents
 │   ├── run_evaluation.py      # Evaluates benchmark IR metrics across modes
 │   └── download_nltk.py       # Pre-caches NLTK corpora
-├── tests/                     # Comprehensive automated pytest suite (44 tests)
+├── tests/                     # Comprehensive automated pytest suite (50 tests)
 │   ├── test_preprocessor.py
 │   ├── test_document_processor.py
 │   ├── test_indexing_and_search.py
 │   ├── test_attention_and_clustering.py
 │   ├── test_llm_and_summarization.py
 │   ├── test_database_and_operations.py
+│   ├── test_visualization_service.py
 │   └── test_flask_routes.py
 └── docs/                      # Academic documentation
     ├── ARCHITECTURE.md        # Architecture diagrams & component flows
@@ -92,7 +94,8 @@ NLP/
 
 ### Step 1: Clone or Navigate to Directory
 ```powershell
-cd c:\Users\balut\OneDrive\Desktop\NLP
+git clone https://github.com/Anandavel-Tech/ai-semantic-search-engine-LLM-NLP-.git
+cd ai-semantic-search-engine-LLM-NLP-
 ```
 
 ### Step 2: Create and Activate Virtual Environment
