@@ -20,6 +20,30 @@ Engineered for enterprise document intelligence, technical evaluation, and produ
 
 ---
 
+## 📸 Application Screenshots & Visual Previews
+
+| 1. Intelligent Document Search Portal | 2. Context-Grounded AI Q&A (RAG) |
+| :---: | :---: |
+| ![Search Portal](docs/screenshots/01_search_portal.png) | ![RAG Q&A Interface](docs/screenshots/02_rag_qa_interface.png) |
+| *Hybrid, Semantic, and Lexical multi-mode retrieval with calibrated alpha scoring* | *Context-grounded prompt formulation with security boundaries* |
+
+| 3. Synthesized Grounded Answers | 4. Corpus Document Management |
+| :---: | :---: |
+| ![Synthesized Answer](docs/screenshots/03_rag_qa_answer.png) | ![Document Management](docs/screenshots/04_document_management.png) |
+| *Synthesized answers with verified source citations and domain grounding* | *Multi-document repository with word counts, chunking telemetry, and actions* |
+
+| 5. Lexical Word Cloud Generator | 6. Bigram Co-occurrence Network Graph |
+| :---: | :---: |
+| ![Word Cloud](docs/screenshots/05_visualizations_wordcloud.png) | ![Bigram Network](docs/screenshots/06_visualizations_bigram_network.png) |
+| *Viridis frequency-scaled word cloud with top vocabulary distributions* | *NetworkX force-directed spring layout mapping lexical collocations* |
+
+| 7. Term Frequency Bar Charts | 8. Search Analytics & System Telemetry |
+| :---: | :---: |
+| ![Frequency Bar Chart](docs/screenshots/07_visualizations_barchart.png) | ![Search Telemetry](docs/screenshots/08_analytics_telemetry.png) |
+| *Top-K unigram and bigram distributions with linguistic principles* | *Ground-truth benchmark evaluation (Precision@K, Recall@K, MRR, Latency)* |
+
+---
+
 ## Project Structure
 
 ```text
@@ -77,10 +101,11 @@ NLP/
 │   ├── test_database_and_operations.py
 │   ├── test_visualization_service.py
 │   └── test_flask_routes.py
-└── docs/                      # Academic documentation
+└── docs/                      # Technical documentation & assets
     ├── ARCHITECTURE.md        # Architecture diagrams & component flows
     ├── ALGORITHMS.md          # Full mathematical & algorithmic formulations
-    └── USER_GUIDE.md          # Step-by-step evaluator walkthrough
+    ├── USER_GUIDE.md          # Step-by-step walkthrough & user manual
+    └── screenshots/           # Full resolution UI application previews
 ```
 
 ---
