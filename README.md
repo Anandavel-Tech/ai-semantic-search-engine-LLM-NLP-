@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="docs/images/linkedin_project_showcase_1200x675.png" alt="NeuralSearch Showcase Banner" width="100%" />
+</div>
+
 # AI-Powered Semantic Search Engine Using LLMs and Attention Mechanisms
 
 An end-to-end, production-ready Natural Language Processing (NLP) and Information Retrieval (IR) system built with Python, Flask, PyMuPDF, Scikit-Learn, Gensim, Hugging Face Transformers, Sentence Transformers, and SQLite.
